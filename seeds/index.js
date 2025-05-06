@@ -11,8 +11,6 @@ db.once("open", () => {
     console.log("Database Connected");
 });
 
-console.log('wassup')
-
 
 //picking a random element from array
 const sample = array => array[Math.floor(Math.random() * array.length)];
