@@ -2,13 +2,14 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
-const {campgroundSchema} = require('./schemas.js')
+const {campgroundSchema, reviewSchema} = require('./schemas.js')
 const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override')
 const Campground = require('./models/campground');
 const { request } = require('http');
 const campground = require('./models/campground');
+const Review = require('./models/review')
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp');
 
@@ -37,6 +38,16 @@ const validateCampground = (request, response, next) => {
     }
 }
 
+const validateReview = (request, response, next) => {
+    const {error} = reviewSchema.validate(request.body);
+    if(error){
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    }else{
+        next();
+    }
+}
+
 app.get('/campgrounds', async (request, response) => {
     const campgrounds = await Campground.find({});
     response.render('campgrounds/index', {campgrounds})
@@ -55,7 +66,7 @@ app.post('/campgrounds', validateCampground,  catchAsync( async (request, respon
 
 
 app.get('/campgrounds/:id', catchAsync(async (request, response) =>{
-    const campground = await Campground.findById(request.params.id)
+    const campground = await Campground.findById(request.params.id).populate('reviews');
     response.render('campgrounds/show', {campground})
 }))
 
@@ -76,6 +87,22 @@ app.delete('/campgrounds/:id', catchAsync(async (request, response) =>{
     response.redirect('/campgrounds')
 }))
 
+app.post('/campgrounds/:id/reviews', validateReview, catchAsync(async (request, response) => {
+    const campground = await Campground.findById(request.params.id);
+    const review = new Review(request.body.review)
+    campground.reviews.push(review)
+    await review.save();
+    await campground.save();
+    response.redirect(`/campgrounds/${campground._id}`)
+}))
+
+app.delete('/campgrounds/:id/reviews/:reviewId', catchAsync(async (request, response) =>{
+    const {id, reviewId} = request.params;
+    await Campground.findByIdAndUpdate(id, {$pull: {reviews: reviewId}});
+    await Review.findByIdAndDelete(reviewId);
+    response.redirect(`/campgrounds/${id}`);
+}))
+
 app.all(/(.*)/, (request, response, next) => {
     next(new ExpressError('Page Not Found', 404))
 })
@@ -89,3 +116,4 @@ app.use((error, request, response, next) => {
 app.listen(3000, () => {
     console.log('Serving on port 3000')
 })
+
