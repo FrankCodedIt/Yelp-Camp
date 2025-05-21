@@ -45,6 +45,7 @@ router.get('/:id/edit', catchAsync(async (request, response) => {
 router.put('/:id', validateCampground,  catchAsync(async (request, response) => {
     const {id} = request.params;
     const campground = await Campground.findByIdAndUpdate(id, {...request.body.campground})
+    request.flash('success', 'Successfully updated campground!');
     response.redirect(`/campgrounds/${campground._id}`)
 }))
 
