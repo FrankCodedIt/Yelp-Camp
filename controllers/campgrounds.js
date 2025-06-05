@@ -2,6 +2,7 @@ const Campground = require("../models/campground");
 const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
 const mapBoxToken = process.env.MAPBOX_TOKEN;
 const geocoder = mbxGeocoding({ accessToken: mapBoxToken });
+const {cloudinary} = require("../cloudinary");
 
 module.exports.index = async (request, response) => {
   const campgrounds = await Campground.find({});
@@ -63,6 +64,15 @@ module.exports.updateCampground = async (request, response) => {
   const campground = await Campground.findByIdAndUpdate(id, {
     ...request.body.campground,
   });
+  const imgs = request.files.map( f=> ({url:f.path, filename: f.filename}));
+  campground.images.push(...imgs);
+  await campground.save();
+  if(request.body.deleteImages){
+    for(let filename of request.body.deleteImages){
+      await cloudinary.uploader.destroy(filename);
+    }
+    await campground.updateOne({$pull: {images: {filename: {$in: request.body.deleteImages}}}})
+  }
   request.flash("success", "Successfully updated campground!");
   response.redirect(`/campgrounds/${campground._id}`);
 };
