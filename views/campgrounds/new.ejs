@@ -36,7 +36,10 @@
             <input class="form-control" type="text" id="location" name="campground[image]" required>
             <div class="valid-feedback">Looks good!</div>
         </div> -->
-      <input type="file" name="image" id="" multiple />
+      <div class="mb-3">
+        <label for="formFile" class="form-label">Choose Images</label>
+        <input class="form-control" type="file" id="formFile" name="image" multiple>
+      </div>
       <div class="mb-3 mt-3">
         <label for="price" class="form-label">Campground Price</label>
         <div class="input-group">
