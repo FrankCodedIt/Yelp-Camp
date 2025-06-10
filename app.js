@@ -20,9 +20,9 @@ const campgroundsRoutes = require("./routes/campgrounds");
 const reviewsRoutes = require("./routes/reviews");
 const userRoutes = require("./routes/users");
 const helmet = require('helmet');
-const dbUrl = process.env.DB_URL;
+// const dbUrl = process.env.DB_URL;
 // "mongodb://localhost:27017/yelp-camp"
-mongoose.connect(dbUrl);
+mongoose.connect("mongodb://localhost:27017/yelp-camp");
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -54,6 +54,7 @@ const styleSrcUrls = [
     "https://fonts.googleapis.com/",
     "https://use.fontawesome.com/",
     "https://cdn.jsdelivr.net/",
+    "https://cdnjs.cloudflare.com/",
 ];
 const connectSrcUrls = [
     "https://api.mapbox.com/",
@@ -78,21 +79,21 @@ app.use(
                 "https://res.cloudinary.com/dc05shrl6/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
                 "https://images.unsplash.com/",
             ],
-            fontSrc: ["'self'", ...fontSrcUrls],
+            fontSrc: ["'self'", "https://cdnjs.cloudflare.com/", ...fontSrcUrls],
         },
     })
 );
 
-const store = MongoStore.create({
-    mongoUrl: dbUrl,
-    touchAfter: 24 * 60 * 60,
-    crypto: {
-        secret: 'thisshouldbeabettersecret!'
-    }
-});
+// const store = MongoStore.create({
+//     mongoUrl: dbUrl,
+//     touchAfter: 24 * 60 * 60,
+//     crypto: {
+//         secret: 'thisshouldbeabettersecret!'
+//     }
+// });
 
 const sessionConfig = {
-  store,
+  // store,
   name: 'campgroundSession',
   secret: "thisshouldbeabettersecret!",
   resave: false,
