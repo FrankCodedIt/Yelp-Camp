@@ -5,7 +5,7 @@ mapboxgl.accessToken = mapToken;
 const map = new mapboxgl.Map({
   container: "cluster-map",
   // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
-  style: "mapbox://styles/mapbox/dark-v11",
+  style: "mapbox://styles/mapbox/standard-satellite",
   center: [-103.5917, 40.6699],
   zoom: 3,
 });
@@ -44,7 +44,7 @@ map.on("load", () => {
         10,
         "orange",
         30,
-        "red",
+        "green",
       ],
       "circle-radius": ["step", ["get", "point_count"], 15, 10, 20, 30, 25],
     },
