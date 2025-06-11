@@ -20,9 +20,9 @@ const campgroundsRoutes = require("./routes/campgrounds");
 const reviewsRoutes = require("./routes/reviews");
 const userRoutes = require("./routes/users");
 const helmet = require('helmet');
-// const dbUrl = process.env.DB_URL;
+const dbUrl = process.env.DB_URL;
 // "mongodb://localhost:27017/yelp-camp"
-mongoose.connect("mongodb://localhost:27017/yelp-camp");
+mongoose.connect(dbUrl);
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -84,16 +84,16 @@ app.use(
     })
 );
 
-// const store = MongoStore.create({
-//     mongoUrl: dbUrl,
-//     touchAfter: 24 * 60 * 60,
-//     crypto: {
-//         secret: 'thisshouldbeabettersecret!'
-//     }
-// });
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    touchAfter: 24 * 60 * 60,
+    crypto: {
+        secret: 'thisshouldbeabettersecret!'
+    }
+});
 
 const sessionConfig = {
-  // store,
+  store,
   name: 'campgroundSession',
   secret: "thisshouldbeabettersecret!",
   resave: false,
